@@ -1,12 +1,15 @@
 //
-// Created by liuhao on 6/23/18.
+// Created by Dongguaren on 6/23/18.
 //
 
 #include "ThreadSafeLinkQueue.h"
 #include "LinkQueue.h"
 #include "ErrorHandle.h"
+#include "MyLog.h"
 
 #include <pthread.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 struct threadSafeLinkQueue{
     LQ* lq;
@@ -20,13 +23,13 @@ TSQ* TSQ_new(){
     return res;
 }
 
-void TSQ_push( TSQ* tsq,void *data ){
+void TSQ_add(TSQ *tsq, void *data){
     if( !EH_isArgsLegal("Para illegal.Pointer is null.",2,tsq,data) ){
         return;
     }
 
     pthread_mutex_lock(&(tsq->mutex));
-    LQ_push( tsq->lq,data );
+    LQ_add(tsq->lq, data);
     pthread_mutex_unlock(&(tsq->mutex));
 }
 
@@ -78,8 +81,72 @@ void TSQ_dstory( TSQ* tsq ){
         return;
     }
 
-    LQ_dstory(tsq->lq);
+    LQ_destroy(tsq->lq);
     free(tsq);
+}
+
+
+void TSQ_print(TSQ* tsq){
+    LQ_print( tsq->lq );
+}
+
+
+
+/**
+ *  生产者线程
+ * @param ptr
+ * @return
+ */
+void * TSQ_test_produce(void *ptr)
+{
+    TSQ* tsq=(TSQ*)ptr;
+    for (int i = 0; i < 3; i++)
+    {
+        int *t = malloc(sizeof(int));
+        *t=i;
+        TSQ_add(tsq, t);
+        Log_Info("produce the %d data:%d\n",i,*t);
+        //休眠 1s
+        sleep(1);
+    }
+}
+
+/**
+ * 消费者线程
+ * @param ptr
+ * @return
+ */
+void * TSQ_test_consume(void *ptr)
+{
+    TSQ* tsq=(TSQ*)ptr;
+    for (int i = 0; i < 3;)
+    {
+        if( !TSQ_getLen(tsq) ){
+            continue;
+        }
+
+        i++;
+        int* data = TSQ_getTopAndPop(tsq);
+        Log_Info("consume the %d data:%d\n",i,*data);
+        free(data);
+    }
+}
+
+
+void TSQ_test(){
+    TSQ* tsq = TSQ_new();
+    Log_Info("step 1\n");
+    pthread_t tid1, tid2;
+    Log_Info("step 2\n");
+    pthread_create(&tid1, NULL, TSQ_test_consume, tsq);
+    pthread_create(&tid2, NULL, TSQ_test_produce, tsq);
+    Log_Info("step 3\n");
+
+    // 等待 TSQ_test_consume TSQ_test_produce 对应线程结束后，结束本线程
+    pthread_join(tid1, NULL);
+    pthread_join(tid2, NULL);
+
+    Log_Info("step 4\n");
 }
 
 
