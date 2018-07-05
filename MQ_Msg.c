@@ -8,27 +8,39 @@ struct MessageQueueMessage{
     int insert_rate;
     int flag;
 
-    int sizeofExtraData;
+    int extra_length;
     void *extraData;
 
-    int sizeofMessage;
+    int msg_length;
     unsigned char* message;
 };
 
-MQ_Msg* MQ_Msg_new(int insert_rate,int flag,int sizeofExtraData,void *extraData,int sizeofMessage,unsigned char* message){
-    MQ_Msg* res = malloc(sizeof(MQ_Msg));
+
+
+//typedef struct {
+//    int insert_rate;        //嵌入率
+//    int flag;               //标志位
+//    int msg_length;             //数据信息长度
+//    int extra_length;
+//    void *extraData;        //指针
+//    unsigned char* message; //待传输秘密信息
+//}Msg;
+
+
+Msg* MQ_Msg_new(int insert_rate,int flag,int extra_length,void *extraData,int msg_length,unsigned char* message){
+    Msg* res = malloc(sizeof(Msg));
     res->insert_rate = insert_rate;
     res->flag = flag;
 
-    res->sizeofExtraData = sizeofExtraData;
+    res-> extra_length = extra_length;
     res->extraData = extraData;
 
-    res->sizeofMessage = sizeofMessage;
+    res-> msg_length = msg_length;
     res->message = message;
     return res;
 }
 
-void MQ_Msg_destroy(MQ_Msg* t){
+void MQ_Msg_destroy(Msg* t){
     free(t);
 }
 

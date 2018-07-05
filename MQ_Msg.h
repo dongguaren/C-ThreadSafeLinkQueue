@@ -5,7 +5,7 @@
 #ifndef MYTEST_MQ_MSG_H
 #define MYTEST_MQ_MSG_H
 
-typedef struct MessageQueueMessage MQ_Msg;
+typedef struct MessageQueueMessage Msg;
 
 /**
  * 本函数 申请空间，逐项赋值
@@ -17,13 +17,13 @@ typedef struct MessageQueueMessage MQ_Msg;
  * @param message
  * @return 指针
  */
-MQ_Msg* MQ_Msg_new(int insert_rate,int flag,int sizeofExtraData,void *extraData,int sizeofMessage,unsigned char* message);
+Msg* MQ_Msg_new(int insert_rate,int flag,int sizeofExtraData,void *extraData,int sizeofMessage,unsigned char* message);
 
 /**
  * 目前本函数只有 free(t)
  *
  * @param t
  */
-void MQ_Msg_destroy(MQ_Msg* t);
+void MQ_Msg_destroy(Msg* t);
 
 #endif //MYTEST_MQ_MSG_H
