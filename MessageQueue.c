@@ -32,7 +32,7 @@ void * MQM_TcpServerPthread(void *ptr){
 MQM* MQM_new(){
     MQM* res = (MQM*)malloc(sizeof(MQM));
     res -> defaultListenPort = 12345;
-    res -> myTcpServer = MyTcpServer_createSocket( res -> defaultListenPort );
+    res -> myTcpServer = MyTcpServer_createServer(res->defaultListenPort);
     res -> threadSafeLinkQueue = TSQ_new();
     pthread_create(&(res->tcpPthread), NULL, MQM_TcpServerPthread, res);
     return res;
@@ -89,7 +89,7 @@ void * MQM_test_TcpServerPthread(void *ptr){
 void MQM_test(){
 
     pthread_t tcpPthread;
-    MyTcpServer *myTcpServer = MyTcpServer_createSocket( 12345 );
+    MyTcpServer *myTcpServer = MyTcpServer_createServer(12345);
     pthread_create(&tcpPthread, NULL, MQM_test_TcpServerPthread, myTcpServer);
 }
 

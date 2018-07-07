@@ -6,12 +6,13 @@
 #define MYTEST_MYTCPSERVER_H
 
 #include <unistd.h>
+#include <netinet/in.h>
 
 typedef struct sockaddr_in SockAddrIn;
 
 typedef struct{
     int sock_fd;
-    SockAddrIn *server_addr;
+    SockAddrIn server_addr;
 
 }MyTcpServer;
 
@@ -20,7 +21,7 @@ typedef struct{
  * @param listen_port    监听的端口号
  * @return               tcp 服务器的 point
  */
-MyTcpServer* MyTcpServer_createSocket(int listen_port);
+MyTcpServer* MyTcpServer_createServer(int listen_port);
 
 /**
  * 等待一个连接，并建立这个连接，返回 conn_fileId 连接id
@@ -70,5 +71,7 @@ ssize_t MyTcpServer_sendData(MyTcpServer *tcpStruct, int fd, void *dataBuff, siz
  */
 void MyTcpServer_closeSocket(MyTcpServer *tcpStruct);
 
+
+void MyTcpServer_destroy( MyTcpServer *tcpStruct );
 
 #endif //MYTEST_MYTCPSERVER_H

@@ -7,16 +7,16 @@
 #include "MyLog.h"
 #include "ErrorHandle.h"
 
-struct MessageQueueMessage{
-    int insert_rate;    //嵌入率
-    int flag;           //标志位
-
-    int extra_length;   //额外数据长度
-    void *extraData;    //额外数据
-
-    int msg_length;     //数据信息长度
-    unsigned char* message; //待传输秘密信息
-};
+//struct MessageQueueMessage{
+//    int insert_rate;    //嵌入率
+//    int flag;           //标志位
+//
+//    int extra_length;   //额外数据长度
+//    void *extraData;    //额外数据
+//
+//    int msg_length;     //数据信息长度
+//    unsigned char* message; //待传输秘密信息
+//};
 
 
 
@@ -33,6 +33,11 @@ Msg* MQ_Msg_new(int insert_rate,int flag,int extra_length,void *extraData,int ms
     res->message = message;
     return res;
 }
+
+Msg* MQ_Msg_newNULL(){
+    return MQ_Msg_new(0,0,0,0,0,0);
+}
+
 
 void MQ_Msg_destroy(Msg* t){
     free(t);
@@ -104,6 +109,15 @@ void MQ_Msg_print( Msg* m ){
     Log_Info("      extra_length:%d\n",m->extra_length);
     if( !(m->extra_length) ){
         char *binStr = MQ_Msg_binaryData2Str(m->extraData,m->extra_length);
+        Log_Info("      extraData:%s\n",binStr);
+        free(binStr);
+
+    }
+
+
+    Log_Info("      msg_length:%d\n",m->msg_length);
+    if( !(m->msg_length) ){
+        char *binStr = MQ_Msg_binaryData2Str(m->message,m->msg_length);
         Log_Info("      extraData:%s\n",binStr);
         free(binStr);
     }

@@ -87,7 +87,7 @@ void EH_printErrorMsg( const char* fileName,const char* funcName,int lineNum,cha
  */
 int EH_testParaLegalAndPrintErrMsg( const char* fileName,const char* funcName,int lineNum,char* errReason,int numOfPara,... ){
 #ifdef GLOBAL_debug_para_check
-    if( numOfPara<0 )return -233;
+    if( numOfPara<0 )return -1;
 
     va_list argp;
     va_start( argp, numOfPara );

@@ -6,10 +6,10 @@
 #include <string.h>
 #include "MyTcpServer.h"
 #include "ErrorHandle.h"
+#include "MyLog.h"
 
 
-
-MyTcpServer* MyTcpServer_createSocket(int listen_port){
+MyTcpServer* MyTcpServer_createServer(int listen_port){
 
 
     MyTcpServer* tcpStruct = (MyTcpServer*)malloc(sizeof(MyTcpServer));
@@ -21,17 +21,22 @@ MyTcpServer* MyTcpServer_createSocket(int listen_port){
         return NULL;
     }
 
+//    tcpStruct->server_addr = (SockAddrIn *)malloc(sizeof(SockAddrIn));
+//    memset(&(tcpStruct->server_addr),0,sizeof(SockAddrIn));
+
+    Log_Info("listen_port:%d\n",listen_port);
     // 填充sockaddr_in结构
     bzero(&(tcpStruct->server_addr), sizeof(struct sockaddr_in));
-    tcpStruct->server_addr->sin_family = AF_INET;
-    tcpStruct->server_addr->sin_addr.s_addr = htonl(INADDR_ANY);
-    tcpStruct->server_addr->sin_port = htons(listen_port);
+    tcpStruct->server_addr.sin_family = AF_INET;
+    tcpStruct->server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    tcpStruct->server_addr.sin_port = htons(listen_port);
 
 
     // 绑定sock_fd描述符
     if (bind(tcpStruct->sock_fd, (struct sockaddr *)(&(tcpStruct->server_addr)), sizeof(struct sockaddr)) == -1) {
         EH_logErrMsg("bind socket error.");
         free(tcpStruct);
+//        free(tcpStruct->server_addr);
         return NULL;
     }
 
@@ -39,6 +44,7 @@ MyTcpServer* MyTcpServer_createSocket(int listen_port){
     if(listen(tcpStruct->sock_fd, 20) == -1) {
         EH_logErrMsg("listen socket error.");
         free(tcpStruct);
+//        free(tcpStruct->server_addr);
         return NULL;
     }
 
@@ -54,15 +60,17 @@ void MyTcpServer_closeSocket(MyTcpServer *tcpStruct){
     }
 
     close(tcpStruct -> sock_fd);
-    free(tcpStruct);
 }
 
 int MyTcpServer_acceptAndCreateConnection(MyTcpServer *tcpStruct){
+
     if( !EH_isArgsLegal("Para illegal.Pointer is null.",1,tcpStruct) ){
         return -1;
     }
 
-    int conn_fd  = accept(tcpStruct -> sock_fd, (struct sockaddr *)NULL, NULL);
+//    Log_Info("789\n");
+
+    int conn_fd = accept(tcpStruct -> sock_fd, (struct sockaddr *)NULL, NULL);
     if( conn_fd == -1 ){
         EH_logErrMsg("accept return value is -1.");
         return -1;
@@ -93,5 +101,19 @@ ssize_t MyTcpServer_sendData(MyTcpServer *tcpStruct, int fd, void *dataBuff, siz
     }
 
     return send(fd, dataBuff, buffLen, 0);
+}
+
+
+void MyTcpServer_destroy( MyTcpServer *tcpStruct ){
+    if( !EH_isArgsLegal("Para illegal.Pointer is null.",1,tcpStruct) ){
+        return;
+    }
+
+    if( !EH_isArgsLegal("Para illegal.Pointer is null.",1,tcpStruct->server_addr) ){
+        return;
+    }
+
+//    free(tcpStruct->server_addr);
+    free(tcpStruct);
 }
 

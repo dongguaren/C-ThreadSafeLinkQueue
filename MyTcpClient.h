@@ -6,6 +6,8 @@
 #define MYTEST_TCPCLIENT_H
 
 #include <unistd.h>
+#include <netinet/in.h>
+
 
 typedef struct{
     int sock_fd;
