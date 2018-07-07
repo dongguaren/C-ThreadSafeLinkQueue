@@ -7,6 +7,10 @@
 
 #include <stdio.h>
 
+/**
+ * 定义函数中使用的 log 函数
+ *
+ */
 #define Log_Info(...) printf(__VA_ARGS__)
 
 #endif //MYTEST_MYLOG_H

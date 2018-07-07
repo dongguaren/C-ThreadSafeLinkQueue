@@ -26,4 +26,12 @@ Msg* MQ_Msg_new(int insert_rate,int flag,int sizeofExtraData,void *extraData,int
  */
 void MQ_Msg_destroy(Msg* t);
 
+/**
+ * 打印一个 msg
+ * @param m
+ */
+void MQ_Msg_print( Msg* m );
+
+void MQ_Msg_test();
+
 #endif //MYTEST_MQ_MSG_H
