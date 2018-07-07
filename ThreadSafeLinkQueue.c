@@ -134,17 +134,24 @@ void * TSQ_test_consume(void *ptr)
 
 
 void TSQ_test(){
-    TSQ* tsq = TSQ_new();
+    TSQ* tsq1 = TSQ_new();
+    TSQ* tsq2 = TSQ_new();
     Log_Info("step 1\n");
     pthread_t tid1, tid2;
+    pthread_t tid3, tid4;
     Log_Info("step 2\n");
-    pthread_create(&tid1, NULL, TSQ_test_consume, tsq);
-    pthread_create(&tid2, NULL, TSQ_test_produce, tsq);
+    pthread_create(&tid1, NULL, TSQ_test_consume, tsq1);
+    pthread_create(&tid2, NULL, TSQ_test_produce, tsq1);
+
+    pthread_create(&tid3, NULL, TSQ_test_consume, tsq2);
+    pthread_create(&tid4, NULL, TSQ_test_produce, tsq2);
     Log_Info("step 3\n");
 
     // 等待 TSQ_test_consume TSQ_test_produce 对应线程结束后，结束本线程
     pthread_join(tid1, NULL);
     pthread_join(tid2, NULL);
+    pthread_join(tid3, NULL);
+    pthread_join(tid4, NULL);
 
     Log_Info("step 4\n");
 }

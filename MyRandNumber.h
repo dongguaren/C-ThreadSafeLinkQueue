@@ -1,12 +1,10 @@
 //
-// Created by Dongguaren on 2018/6/22.
+// Created by Dongguaren on 7/6/18.
 //
 
-#ifndef FIRST_TEST_MYFUNCTION_H
-#define FIRST_TEST_MYFUNCTION_H
+#ifndef MYTEST_MYRANDNUMBER_H
+#define MYTEST_MYRANDNUMBER_H
 
-#include <stdio.h>
-#include <stdlib.h>
 /**
  * 返回一个 int 指针，指向一个数组，里面升序存放 最小值为 minRandNum，最大值为 maxRandNum 的 数量为 numOfRand 的随机数
  *
@@ -19,4 +17,7 @@
  *                           如果参数不合法，则返回 NULL
  */
 int* getRandPosition( unsigned int seed,int minRandNum,int maxRandNum,int numOfRand );
-#endif //FIRST_TEST_MYFUNCTION_H
+
+void MRN_test();
+
+#endif //MYTEST_MYRANDNUMBER_H

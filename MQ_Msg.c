@@ -3,6 +3,7 @@
 //
 #include <stdlib.h>
 #include "MQ_Msg.h"
+#include "MyLog.h"
 
 struct MessageQueueMessage{
     int insert_rate;
@@ -33,6 +34,7 @@ Msg* MQ_Msg_new(int insert_rate,int flag,int extra_length,void *extraData,int ms
     res->flag = flag;
 
     res-> extra_length = extra_length;
+
     res->extraData = extraData;
 
     res-> msg_length = msg_length;
@@ -42,5 +44,19 @@ Msg* MQ_Msg_new(int insert_rate,int flag,int extra_length,void *extraData,int ms
 
 void MQ_Msg_destroy(Msg* t){
     free(t);
+}
+
+
+void MQ_Msg_print( Msg* m ){
+    Log_Info("----- msg ------\n");
+
+    Log_Info("      insert_rate:%d\n",m->insert_rate);
+    Log_Info("      flag:%d\n",m->flag);
+    Log_Info("      extra_length:%d\n",m->extra_length);
+    Log_Info("      extraData:%s\n",m->extraData);
+
+
+
+    Log_Info("----- /msg ------\n");
 }
 

@@ -7,9 +7,11 @@
 
 #include <unistd.h>
 
+typedef struct sockaddr_in SockAddrIn;
+
 typedef struct{
     int sock_fd;
-    struct sockaddr_in server_addr;
+    SockAddrIn *server_addr;
 
 }MyTcpServer;
 

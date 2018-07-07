@@ -97,7 +97,8 @@ int EH_testParaLegalAndPrintErrMsg( const char* fileName,const char* funcName,in
     int isLegal=1;
 
     for( i=0;i<numOfPara;i++ ){
-        p=va_arg( argp,void*);
+
+        va_arg( argp,void*);
         if( p == NULL ){
             isLegal=0;
             break;

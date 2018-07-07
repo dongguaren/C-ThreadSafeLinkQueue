@@ -23,15 +23,16 @@ MQM* MQM_new();
  * @param manager MessageQueueManager 指针
  * @return NULL -> 无消息  有消息则返回对应的 msg 指针
  */
-MQ_Msg* MQM_getMsg( MQM* manager );
+Msg* MQM_getMsg( MQM* manager );
 
 
 /**
  * 向 MessageQueueManager 发送消息
- * @param manager       MessageQueueManager 指针
- * @param msg           消息指针
+ * @param manager
+ * @param msgText   消息文本指针  最后不含 '/0'
+ * @param msgLen    消息长度
  */
-void MQM_sendMessge( MQM* manager,MQ_Msg* msg );
+void MQM_sendMessge( MQM* manager,char* msgText,int msgLen );
 
 
 

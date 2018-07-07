@@ -23,9 +23,9 @@ MyTcpServer* MyTcpServer_createSocket(int listen_port){
 
     // 填充sockaddr_in结构
     bzero(&(tcpStruct->server_addr), sizeof(struct sockaddr_in));
-    tcpStruct->server_addr.sin_family = AF_INET;
-    tcpStruct->server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    tcpStruct->server_addr.sin_port = htons(listen_port);
+    tcpStruct->server_addr->sin_family = AF_INET;
+    tcpStruct->server_addr->sin_addr.s_addr = htonl(INADDR_ANY);
+    tcpStruct->server_addr->sin_port = htons(listen_port);
 
 
     // 绑定sock_fd描述符
