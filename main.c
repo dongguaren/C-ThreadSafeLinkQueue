@@ -13,7 +13,7 @@
 #include "MyRandNumber.h"
 #include "MQ_Msg.h"
 #include "CodeTest/CodeTest.h"
-
+#include "CodeTest/Test_MessageServerAndClient.h"
 
 
 int main()
@@ -21,7 +21,8 @@ int main()
 //    TSQ_test();
 //    MRN_test();
 //    MQ_Msg_test();
-    CodeTest_sendMsgByTcpClient();
+//    CodeTest_sendMsgByTcpClient();
+    TestMassge_test();
     return 0;
 
 

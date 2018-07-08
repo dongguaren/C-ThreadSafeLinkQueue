@@ -73,5 +73,6 @@ void MyTcpClient_closeClient(MyTcpClient *tcpStruct){
 
     close(tcpStruct -> sock_fd);
     free(tcpStruct);
+//    tcpStruct = NULL;
 }
 

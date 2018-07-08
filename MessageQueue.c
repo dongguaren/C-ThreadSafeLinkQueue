@@ -71,9 +71,6 @@ void MQM_sendMessge( MQM* manager,char* msgText,int msgLen ){
 
 }
 
-
-
-
 /**
  * test
  * tcp server 线程

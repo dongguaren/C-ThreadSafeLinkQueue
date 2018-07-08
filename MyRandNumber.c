@@ -21,11 +21,17 @@ RND* RND_create( unsigned int seed ){
 }
 
 void RND_free( RND* rnd ){
+    if( !EH_isArgsLegal("Para illegal.Pointer is null.",1,rnd) ){
+        return;
+    }
     free(rnd);
 }
 
 unsigned int MRN_rand(RND *myRandNumberData)
 {
+    if( !EH_isArgsLegal("Para illegal.Pointer is null.",1,myRandNumberData) ){
+        return 0;
+    }
     unsigned int r;
     /* 返回一个无符号32位整型的伪随机数. */
     myRandNumberData->randSeed = myRandNumberData->randSeed * 1103515245 + 12345;
@@ -98,6 +104,9 @@ int* getRandPosition( unsigned int seed,int minRandNum,int maxRandNum,int numOfR
 
 
 void MRN_printRandArray( int *array,int len ){
+    if( !EH_isArgsLegal("Para illegal.Pointer is null.",1,array) ){
+        return;
+    }
     Log_Info("------ rand array ------\n");
     Log_Info("         The len:%d\n",len);
     int i;

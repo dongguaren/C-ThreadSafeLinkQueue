@@ -7,6 +7,8 @@
 #include "MyLog.h"
 #include "ErrorHandle.h"
 
+
+
 //struct MessageQueueMessage{
 //    int insert_rate;    //嵌入率
 //    int flag;           //标志位
@@ -21,6 +23,29 @@
 
 
 Msg* MQ_Msg_new(int insert_rate,int flag,int extra_length,void *extraData,int msg_length,unsigned char* message){
+
+
+    if( extra_length == 0 && extraData != NULL ){
+        EH_logErrMsg("extraData length is 0 but extraData point is not NULL!");
+        return NULL;
+    }
+
+    if( extra_length != 0 && extraData == NULL ){
+        EH_logErrMsg("extraData length is not 0 but extraData point is NULL!");
+        return NULL;
+    }
+
+    if( msg_length == 0 && message != NULL ){
+        EH_logErrMsg("msg length is 0 but message point is not NULL!");
+        return NULL;
+    }
+
+    if( msg_length != 0 && message == NULL ){
+        EH_logErrMsg("msg length is not 0 but message point is NULL!");
+        return NULL;
+    }
+
+
     Msg* res = malloc(sizeof(Msg));
     res->insert_rate = insert_rate;
     res->flag = flag;
@@ -40,7 +65,16 @@ Msg* MQ_Msg_newNULL(){
 
 
 void MQ_Msg_destroy(Msg* t){
+    if( !EH_isArgsLegal("Para illegal.Pointer is null.",1,t) ){
+        return;
+    }
     free(t);
+    if( t->msg_length!=0 ){
+        free(t->message);
+    }
+    if( t->extra_length!=0 ){
+        free(t->extraData);
+    }
 }
 
 
@@ -51,6 +85,10 @@ void MQ_Msg_destroy(Msg* t){
  * @param data
  */
 void MQ_Msg_wordData2Char( char* str,void *data ){
+    if( !EH_isArgsLegal("Para illegal.Pointer is null.",2,str,data) ){
+        return;
+    }
+
     int i;
     unsigned int inData = *(unsigned int*)data;
     for( i=0;i<8;i++,inData >>= 1 ){
@@ -102,12 +140,17 @@ char* MQ_Msg_binaryData2Str( void *data,int dataByteLen ){
  * @param m
  */
 void MQ_Msg_print( Msg* m ){
+
+    if( !EH_isArgsLegal("Para illegal.Pointer is null.",1,m) ){
+        return;
+    }
+
     Log_Info("----- msg ------\n");
 
     Log_Info("      insert_rate:%d\n",m->insert_rate);
     Log_Info("      flag:%d\n",m->flag);
     Log_Info("      extra_length:%d\n",m->extra_length);
-    if( !(m->extra_length) ){
+    if(m->extra_length){
         char *binStr = MQ_Msg_binaryData2Str(m->extraData,m->extra_length);
         Log_Info("      extraData:%s\n",binStr);
         free(binStr);
@@ -116,7 +159,7 @@ void MQ_Msg_print( Msg* m ){
 
 
     Log_Info("      msg_length:%d\n",m->msg_length);
-    if( !(m->msg_length) ){
+    if(m->msg_length){
         char *binStr = MQ_Msg_binaryData2Str(m->message,m->msg_length);
         Log_Info("      extraData:%s\n",binStr);
         free(binStr);
@@ -128,10 +171,21 @@ void MQ_Msg_print( Msg* m ){
 
 
 
+
+
+
+
+
+
+
+
+
 void MQ_Msg_test(){
+
+    // 测试 单字节转换
 //    test_MQ_Msg_wordData2Char();
 
-
+    //------------------ 测试 多字节转换 ---------------------------//
     unsigned int num = 0xfffffff0;
     char* str = MQ_Msg_binaryData2Str( &num,4 );
     Log_Info("%s\n",str);
