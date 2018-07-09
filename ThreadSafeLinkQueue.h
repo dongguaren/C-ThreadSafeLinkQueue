@@ -5,12 +5,18 @@
 #ifndef MYTEST_THREADSAFELINKQUEUE_H
 #define MYTEST_THREADSAFELINKQUEUE_H
 
+#include <pthread.h>
+#include "LinkQueue.h"
+
 /**
  * 线程安全消息队列
  *  在 LinkQueue 的基础上加入了 互斥量
  */
 
-typedef struct threadSafeLinkQueue ThreadSafeLinkQueue;
+typedef struct threadSafeLinkQueue{
+    LQ* lq;
+    pthread_mutex_t mutex;
+} ThreadSafeLinkQueue;
 
 typedef ThreadSafeLinkQueue TSQ;
 

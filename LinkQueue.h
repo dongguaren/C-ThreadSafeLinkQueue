@@ -5,8 +5,18 @@
 #ifndef FIRST_TEST_LINKQUEUE_H
 #define FIRST_TEST_LINKQUEUE_H
 
+typedef struct lq_node LQ_Node;
+struct lq_node{
+    void *data;
+    LQ_Node *next;
+};
 
-typedef struct linkQueue LinkQueue;
+typedef struct linkQueue{
+    LQ_Node* head;
+    LQ_Node* tail;
+    LQ_Node* secTail;
+    int len;
+} LinkQueue;
 
 typedef LinkQueue LQ;
 

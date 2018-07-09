@@ -4,36 +4,64 @@
 
 #include <stdlib.h>
 #include <pthread.h>
-#include "ThreadSafeLinkQueue.h"
 #include "MessageQueue.h"
-#include "MyTcpServer.h"
+#include "MyLog.h"
+#include "ErrorHandle.h"
+#include "MessageTcpClient.h"
 
-struct messageQueueManager{
-
-    int defaultListenPort;
-    MyTcpServer *myTcpServer;
-    ThreadSafeLinkQueue *threadSafeLinkQueue;
-    pthread_t tcpPthread;
-
-};
-
-
+void MQM_destoryAtThread(MQM* mqm);
 /**
  * tcp server 线程
  * @param ptr
  * @return
  */
 void * MQM_TcpServerPthread(void *ptr){
+
+    pthread_cleanup_push(MQM_destoryAtThread,ptr);
+
     MQM* mqm = (MQM*)ptr;
-    int con_id = MyTcpServer_acceptAndCreateConnection( mqm -> myTcpServer );
+    mqm->conId = MsgTS_acceptAndCreateConnection( mqm->tcpServer );
+
+    static int recvMessTime = 0;
+
+    Msg* recvMsg = NULL;
+    for(;;){
+
+//        sleep(1);
+
+        pthread_testcancel();
+        recvMsg = MsgTS_recvMsg(mqm->tcpServer,mqm->conId);
+        if( recvMsg == NULL ){
+            EH_logErrMsg("Server thread has stopped!\n");
+            break;
+        }
+        pthread_testcancel();
+
+        Log_Info("-------------- TcpServer recv mess --------------\n");
+        Log_Info("The %d Message:\n",++recvMessTime);
+        MQ_Msg_print(recvMsg);
+        TSQ_add( mqm -> threadSafeLinkQueue,recvMsg );
+        Log_Info("The %d Message has added threadSafeLinkQueue\n",recvMessTime);
+        Log_Info("-------------- /TcpServer recv mess --------------\n");
+        MQ_Msg_destroy(recvMsg);
+
+    }
+    pthread_cleanup_pop(0);
 }
 
 
-MQM* MQM_new(){
+
+MQM* MQM_new(int port){
+    if( port <= 1000){
+        EH_logErrMsg("Para illegal.listen port must bigger than 1000!");
+        return NULL;
+    }
+
     MQM* res = (MQM*)malloc(sizeof(MQM));
-    res -> defaultListenPort = 12345;
-    res -> myTcpServer = MyTcpServer_createServer(res->defaultListenPort);
+    res -> defaultListenPort = port;
+    res -> tcpServer = MsgTS_createServer(res->defaultListenPort);
     res -> threadSafeLinkQueue = TSQ_new();
+    res -> conId = -1;
     pthread_create(&(res->tcpPthread), NULL, MQM_TcpServerPthread, res);
     return res;
 }
@@ -60,34 +88,111 @@ Msg* MQM_getMsg( MQM* manager ){
 
 /**
  * 向 MessageQueueManager 发送消息
- * @param manager
+ * @param mqm
  * @param msgText   消息文本指针  最后不含 '/0'
  * @param msgLen    消息长度
  */
-void MQM_sendMessge( MQM* manager,char* msgText,int msgLen ){
+void MQM_sendMessge( MQM* mqm,char* msgText,int msgLen ){
+    if( !EH_isArgsLegal("Para illegal.Pointer is null.",2,mqm,msgText) ){
+        return;
+    }
+
+    if( msgLen <= 0){
+        EH_logErrMsg("Para illegal.msgLen must be positive number!");
+        return;
+    }
+
+    if( mqm->conId == -1){
+        EH_logErrMsg("MessageQueueManager 's conId is -1.Tcp connection is not create!");
+        return;
+    }
+
+    Msg* sendMsg = MQ_Msg_new( 0,0,0,NULL,msgLen,msgText );
+    MsgTS_sendMsg( mqm->tcpServer,mqm->conId,sendMsg );
+}
 
 
+void MQM_destoryAtThread(MQM* mqm){
+    Log_Info("thread destroy function is called!\n");
+    MsgTS_closeConnection( mqm->tcpServer,mqm->conId );
+    MsgTS_destroy(mqm->tcpServer);
+    TSQ_dstory(mqm->threadSafeLinkQueue);
+    free(mqm);
+}
 
+
+void MQM_destory( MQM* mqm ){
+    if( !EH_isArgsLegal("Para illegal.Pointer is null.",1,mqm) ){
+        return;
+    }
+
+    pthread_cancel(mqm->tcpPthread);
 
 }
 
-/**
- * test
- * tcp server 线程
- * @param ptr
- * @return
- */
-void * MQM_test_TcpServerPthread(void *ptr){
-    MyTcpServer *myTcpServer = (MyTcpServer*)ptr;
-    int con_id = MyTcpServer_acceptAndCreateConnection( myTcpServer );
+
+
+
+void * test_MQM_TcpServerPthread(void *ptr){
+    MQM* server = (MQM*)ptr;
+    Msg* recvMsg = NULL;
+    for(;;){
+        sleep(1);
+        recvMsg = MQM_getMsg(server);
+        if( recvMsg ){
+            Log_Info("------------ Server recv mess ------------:\n");
+            MQ_Msg_print(recvMsg);
+            Log_Info("------------ /Server recv mess ------------:\n");
+
+            if(recvMsg->flag == -1){
+                MQM_destory(server);
+                break;
+            }
+        }
+    }
 }
 
 
 void MQM_test(){
+    int port = 18888;
+    MQM* server = MQM_new(port);
 
     pthread_t tcpPthread;
-    MyTcpServer *myTcpServer = MyTcpServer_createServer(12345);
-    pthread_create(&tcpPthread, NULL, MQM_test_TcpServerPthread, myTcpServer);
+    pthread_create(&tcpPthread, NULL, test_MQM_TcpServerPthread, server);
+
+    sleep(1);
+
+    MsgTc* client = MsgTc_createClient("127.0.0.1",port);
+    MsgTc_connectServer(client);
+    Msg *msg=NULL;
+
+
+    msg = MQ_Msg_new(1,1,0,0,0,0);
+    Log_Info("------------ Client send mess ------------:\n");
+    MQ_Msg_print(msg);
+    Log_Info("------------ /Client send mess ------------:\n");
+    MsgTC_sendMsg(client,msg);
+    MQ_Msg_destroy(msg);
+    Log_Info("\n\n");
+
+
+
+//    msg = MQ_Msg_new(1,-1,0,0,0,0);
+//    Log_Info("------------ Client send mess ------------:\n");
+//    MQ_Msg_print(msg);
+//    Log_Info("------------ /Client send mess ------------:\n");
+//    MsgTC_sendMsg(client,msg);
+//    MQ_Msg_destroy(msg);
+//    Log_Info("\n\n");
+
+
+//    MsgTc_closeClient( client );
+
+    pthread_join(tcpPthread, NULL);
+    MsgTc_closeClient( client );
+
+
+
 }
 
 

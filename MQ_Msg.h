@@ -39,6 +39,8 @@ Msg* MQ_Msg_newNULL();
  */
 void MQ_Msg_destroy(Msg* t);
 
+int MQ_Msg_checkLegal( Msg* t );
+
 
 
 /**

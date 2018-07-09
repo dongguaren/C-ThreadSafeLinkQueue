@@ -3,18 +3,16 @@
 //
 
 #include "ThreadSafeLinkQueue.h"
-#include "LinkQueue.h"
 #include "ErrorHandle.h"
 #include "MyLog.h"
 
-#include <pthread.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-struct threadSafeLinkQueue{
-    LQ* lq;
-    pthread_mutex_t mutex;
-};
+//struct threadSafeLinkQueue{
+//    LQ* lq;
+//    pthread_mutex_t mutex;
+//};
 
 TSQ* TSQ_new(){
     TSQ* res = (TSQ*)malloc(sizeof(TSQ));

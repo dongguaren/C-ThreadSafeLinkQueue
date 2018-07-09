@@ -47,6 +47,7 @@ Msg* MQ_Msg_new(int insert_rate,int flag,int extra_length,void *extraData,int ms
 
 
     Msg* res = malloc(sizeof(Msg));
+
     res->insert_rate = insert_rate;
     res->flag = flag;
 

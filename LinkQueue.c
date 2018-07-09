@@ -7,13 +7,13 @@
 #include "ErrorHandle.h"
 #include "MyLog.h"
 
-typedef struct lq_node LQ_Node;
-
-
-struct lq_node{
-    void *data;
-    LQ_Node *next;
-};
+//typedef struct lq_node LQ_Node;
+//
+//
+//struct lq_node{
+//    void *data;
+//    LQ_Node *next;
+//};
 
 LQ_Node* LQ_Node_new(void* data,LQ_Node* next ){
     LQ_Node* newNode = (LQ_Node*)malloc(sizeof(LQ_Node));
@@ -30,12 +30,12 @@ void LQ_Node_free( LQ_Node* lq_node ){
 }
 
 
-struct linkQueue{
-    LQ_Node* head;
-    LQ_Node* tail;
-    LQ_Node* secTail;
-    int len;
-};
+//struct linkQueue{
+//    LQ_Node* head;
+//    LQ_Node* tail;
+//    LQ_Node* secTail;
+//    int len;
+//};
 
 LinkQueue* LQ_new(){
     LinkQueue* lq = (LinkQueue*)malloc(sizeof(LinkQueue));

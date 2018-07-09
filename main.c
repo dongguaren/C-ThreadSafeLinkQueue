@@ -14,6 +14,7 @@
 #include "MQ_Msg.h"
 #include "CodeTest/CodeTest.h"
 #include "CodeTest/Test_MessageServerAndClient.h"
+#include "MessageQueue.h"
 
 
 int main()
@@ -22,7 +23,8 @@ int main()
 //    MRN_test();
 //    MQ_Msg_test();
 //    CodeTest_sendMsgByTcpClient();
-    TestMassge_test();
+//    TestMassge_test();
+    MQM_test();
     return 0;
 
 

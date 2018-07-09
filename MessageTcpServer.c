@@ -47,7 +47,26 @@ Msg* MsgTS_recvMsg( MsgTS *tcpStruct,int con_id ){
 
     Msg* res = MQ_Msg_newNULL();
 
-    MyTcpServer_recvData( tcpStruct->tcpServer,con_id,res, sizeof(Msg));
+
+    /**
+     * note:
+     * recv 函数返回 0 代表 连接已经关闭了
+     * 小于 0 代表出错了
+     * 所以此处需要做处理
+     */
+    int resState = (int) MyTcpServer_recvData( tcpStruct->tcpServer,con_id,res, sizeof(Msg));
+
+    if( resState == 0 ){
+        EH_logErrMsg("tcp client has closed!");
+        MQ_Msg_destroy(res);
+        return NULL;
+    }
+    if( resState < 0 ){
+        EH_logErrMsg("tcp client error!");
+        MQ_Msg_destroy(res);
+        return NULL;
+    }
+
 
     if( res->msg_length != 0 ){
         Log_Info("%d\n",res->msg_length);
