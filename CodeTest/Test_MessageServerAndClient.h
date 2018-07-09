@@ -1,0 +1,10 @@
+//
+// Created by Dongguaren on 7/8/18.
+//
+
+#ifndef MYTEST_TEST_MESSAGESERVERANDCLIENT_H
+#define MYTEST_TEST_MESSAGESERVERANDCLIENT_H
+
+void TestMassge_test();
+
+#endif //MYTEST_TEST_MESSAGESERVERANDCLIENT_H

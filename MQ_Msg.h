@@ -5,6 +5,8 @@
 #ifndef MYTEST_MQ_MSG_H
 #define MYTEST_MQ_MSG_H
 
+
+
 typedef struct MessageQueueMessage {
     int insert_rate;    //嵌入率
     int flag;           //标志位

@@ -8,6 +8,7 @@
 #include "MyLog.h"
 #include "ErrorHandle.h"
 #include "MessageTcpClient.h"
+#include "MQ_Msg_What.h"
 
 void MQM_destoryAtThread(MQM* mqm);
 /**
@@ -43,7 +44,6 @@ void * MQM_TcpServerPthread(void *ptr){
         TSQ_add( mqm -> threadSafeLinkQueue,recvMsg );
         Log_Info("The %d Message has added threadSafeLinkQueue\n",recvMessTime);
         Log_Info("-------------- /TcpServer recv mess --------------\n");
-        MQ_Msg_destroy(recvMsg);
 
     }
     pthread_cleanup_pop(0);
@@ -137,15 +137,16 @@ void * test_MQM_TcpServerPthread(void *ptr){
     MQM* server = (MQM*)ptr;
     Msg* recvMsg = NULL;
     for(;;){
-        sleep(1);
+//        sleep(1);
         recvMsg = MQM_getMsg(server);
         if( recvMsg ){
             Log_Info("------------ Server recv mess ------------:\n");
             MQ_Msg_print(recvMsg);
             Log_Info("------------ /Server recv mess ------------:\n");
 
-            if(recvMsg->flag == -1){
+            if(recvMsg->flag == MsgWhat()->QuitMessageQueue){
                 MQM_destory(server);
+                Log_Info("MQM_destory\n");
                 break;
             }
         }
@@ -154,7 +155,7 @@ void * test_MQM_TcpServerPthread(void *ptr){
 
 
 void MQM_test(){
-    int port = 18888;
+    int port = 18901;
     MQM* server = MQM_new(port);
 
     pthread_t tcpPthread;
@@ -177,18 +178,21 @@ void MQM_test(){
 
 
 
-//    msg = MQ_Msg_new(1,-1,0,0,0,0);
-//    Log_Info("------------ Client send mess ------------:\n");
-//    MQ_Msg_print(msg);
-//    Log_Info("------------ /Client send mess ------------:\n");
-//    MsgTC_sendMsg(client,msg);
-//    MQ_Msg_destroy(msg);
-//    Log_Info("\n\n");
+    msg = MQ_Msg_new(1,MsgWhat()->QuitMessageQueue,0,0,0,0);
+    Log_Info("------------ Client send mess ------------:\n");
+    MQ_Msg_print(msg);
+    Log_Info("------------ /Client send mess ------------:\n");
+    MsgTC_sendMsg(client,msg);
+    MQ_Msg_destroy(msg);
+    Log_Info("\n\n");
 
 
 //    MsgTc_closeClient( client );
 
     pthread_join(tcpPthread, NULL);
+
+
+
     MsgTc_closeClient( client );
 
 
