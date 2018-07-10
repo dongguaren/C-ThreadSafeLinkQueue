@@ -33,6 +33,23 @@ void * MQM_TcpServerPthread(void *ptr){
 
 //        sleep(1);
         recvMsg = MsgTS_recvMsg(mqm->tcpServer,mqm->conId);
+
+        /**
+         * 这种情况应该不会出现
+         *
+         * 如果 app 关闭了 tcp 连接
+         * 那么 recvMsg == NULL
+         *
+         * 向 消息队列 中添加一条 end_all 的消息
+         * 并关闭并销毁 tcp server
+         * 退出循环 即关闭了 tcp server thread
+         *
+         * 
+         * end_all 消息会被 雨航 的代码取走
+         * 然后 雨航 调用 MQM_destory 函数
+         * MQM_destory 会销毁 消息队列
+         *
+         */
         if( recvMsg == NULL ){
 
             TSQ_add( mqm -> threadSafeLinkQueue,MQ_Msg_newEndAll() );
@@ -60,11 +77,6 @@ void * MQM_TcpServerPthread(void *ptr){
         Log_Info("-------------- /TcpServer recv mess --------------\n");
 
     }
-
-
-
-
-
 
 //    pthread_cleanup_pop(0);
 }
