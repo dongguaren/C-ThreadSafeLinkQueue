@@ -57,8 +57,8 @@ Msg* MsgTS_recvMsg( MsgTS *tcpStruct,int con_id ){
     int resState = (int) MyTcpServer_recvData( tcpStruct->tcpServer,con_id,res, sizeof(Msg));
 
     if( resState == 0 ){
-        EH_logErrMsg("tcp client has closed!");
-        MQ_Msg_destroy(res);
+//        EH_logErrMsg("tcp client has closed!");
+//        MQ_Msg_destroy(res);
         return NULL;
     }
     if( resState < 0 ){

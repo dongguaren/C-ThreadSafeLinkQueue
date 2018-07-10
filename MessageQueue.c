@@ -4,6 +4,9 @@
 
 #include <stdlib.h>
 #include <pthread.h>
+#include <bits/signum.h>
+#include <signal.h>
+#include <string.h>
 #include "MessageQueue.h"
 #include "MyLog.h"
 #include "ErrorHandle.h"
@@ -18,7 +21,7 @@ void MQM_destoryAtThread(MQM* mqm);
  */
 void * MQM_TcpServerPthread(void *ptr){
 
-    pthread_cleanup_push(MQM_destoryAtThread,ptr);
+
 
     MQM* mqm = (MQM*)ptr;
     mqm->conId = MsgTS_acceptAndCreateConnection( mqm->tcpServer );
@@ -29,14 +32,25 @@ void * MQM_TcpServerPthread(void *ptr){
     for(;;){
 
 //        sleep(1);
-
-        pthread_testcancel();
         recvMsg = MsgTS_recvMsg(mqm->tcpServer,mqm->conId);
         if( recvMsg == NULL ){
-            EH_logErrMsg("Server thread has stopped!\n");
+
+            TSQ_add( mqm -> threadSafeLinkQueue,MQ_Msg_newEndAll() );
+
+            MsgTS_closeConnection( mqm->tcpServer,mqm->conId );
+            MsgTS_destroy(mqm->tcpServer);
+            break;
+
+        } else if( recvMsg->flag == MsgWhat()->QuitMessageQueue ){
+
+            Log_Info("TcpServerPthread recv quit message\n");
+            MsgTS_closeConnection( mqm->tcpServer,mqm->conId );
+            MsgTS_destroy(mqm->tcpServer);
+            TSQ_add( mqm -> threadSafeLinkQueue,recvMsg );
             break;
         }
-        pthread_testcancel();
+        // 安卓里面用不了
+//        pthread_testcancel();
 
         Log_Info("-------------- TcpServer recv mess --------------\n");
         Log_Info("The %d Message:\n",++recvMessTime);
@@ -46,7 +60,13 @@ void * MQM_TcpServerPthread(void *ptr){
         Log_Info("-------------- /TcpServer recv mess --------------\n");
 
     }
-    pthread_cleanup_pop(0);
+
+
+
+
+
+
+//    pthread_cleanup_pop(0);
 }
 
 
@@ -126,7 +146,12 @@ void MQM_destory( MQM* mqm ){
         return;
     }
 
-    pthread_cancel(mqm->tcpPthread);
+//    pthread_cancel(mqm->tcpPthread);
+
+    // free 消息队列
+    TSQ_dstory(mqm->threadSafeLinkQueue);
+    free(mqm);
+    // free itself
 
 }
 
@@ -155,7 +180,7 @@ void * test_MQM_TcpServerPthread(void *ptr){
 
 
 void MQM_test(){
-    int port = 18901;
+    int port = 18904;
     MQM* server = MQM_new(port);
 
     pthread_t tcpPthread;
@@ -169,9 +194,9 @@ void MQM_test(){
 
 
     msg = MQ_Msg_new(1,1,0,0,0,0);
-    Log_Info("------------ Client send mess ------------:\n");
+    Log_Info("------------ Client send mess ------------\n");
     MQ_Msg_print(msg);
-    Log_Info("------------ /Client send mess ------------:\n");
+    Log_Info("------------ /Client send mess ------------\n");
     MsgTC_sendMsg(client,msg);
     MQ_Msg_destroy(msg);
     Log_Info("\n\n");
@@ -179,9 +204,9 @@ void MQM_test(){
 
 
     msg = MQ_Msg_new(1,MsgWhat()->QuitMessageQueue,0,0,0,0);
-    Log_Info("------------ Client send mess ------------:\n");
+    Log_Info("------------ Client send mess ------------\n");
     MQ_Msg_print(msg);
-    Log_Info("------------ /Client send mess ------------:\n");
+    Log_Info("------------ /Client send mess ------------\n");
     MsgTC_sendMsg(client,msg);
     MQ_Msg_destroy(msg);
     Log_Info("\n\n");

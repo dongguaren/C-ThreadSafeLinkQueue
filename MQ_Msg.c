@@ -6,6 +6,7 @@
 #include "MQ_Msg.h"
 #include "MyLog.h"
 #include "ErrorHandle.h"
+#include "MQ_Msg_What.h"
 
 
 
@@ -62,6 +63,10 @@ Msg* MQ_Msg_new(int insert_rate,int flag,int extra_length,void *extraData,int ms
 
 Msg* MQ_Msg_newNULL(){
     return MQ_Msg_new(0,0,0,0,0,0);
+}
+
+Msg* MQ_Msg_newEndAll(){
+    return MQ_Msg_new(0,MsgWhat()->QuitMessageQueue,0,0,0,0);
 }
 
 

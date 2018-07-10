@@ -34,6 +34,11 @@ Msg* MQ_Msg_new(int insert_rate,int flag,int sizeofExtraData,void *extraData,int
 
 Msg* MQ_Msg_newNULL();
 
+
+Msg* MQ_Msg_newEndAll();
+
+
+
 /**
  * 目前本函数只有 free(t)
  *
