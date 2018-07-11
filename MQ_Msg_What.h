@@ -7,6 +7,7 @@
 
 typedef struct _MQ_Msg_What{
     int QuitMessageQueue;
+    int FirstHello;
 }MQ_Msg_What;
 
 #define MsgWhat() MQ_Msg_What_getInstance()

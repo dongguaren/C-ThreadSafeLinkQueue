@@ -26,6 +26,12 @@ void * MQM_TcpServerPthread(void *ptr){
     MQM* mqm = (MQM*)ptr;
     mqm->conId = MsgTS_acceptAndCreateConnection( mqm->tcpServer );
 
+
+    // 第一次 向本机 client 发送 flag = MsgWhat()->FirstHello 信息。代表和本机链接已经成功
+    Msg* sendMsg = MQ_Msg_new( 0,MsgWhat()->FirstHello,0,NULL,0,0 );
+    MsgTS_sendMsg( mqm->tcpServer,mqm->conId,sendMsg );
+
+
     static int recvMessTime = 0;
 
     Msg* recvMsg = NULL;
@@ -44,7 +50,7 @@ void * MQM_TcpServerPthread(void *ptr){
          * 并关闭并销毁 tcp server
          * 退出循环 即关闭了 tcp server thread
          *
-         * 
+         *
          * end_all 消息会被 雨航 的代码取走
          * 然后 雨航 调用 MQM_destory 函数
          * MQM_destory 会销毁 消息队列
@@ -205,6 +211,13 @@ void MQM_test(){
     Msg *msg=NULL;
 
 
+    msg = MsgTC_recvMsg(client);
+    Log_Info("------------ Client recv mess ------------\n");
+    MQ_Msg_print(msg);
+    Log_Info("------------ /Client recv mess ------------\n");
+    Log_Info("\n\n");MQ_Msg_destroy(msg);
+
+
     msg = MQ_Msg_new(1,1,0,0,0,0);
     Log_Info("------------ Client send mess ------------\n");
     MQ_Msg_print(msg);
@@ -231,6 +244,7 @@ void MQM_test(){
 
 
     MsgTc_closeClient( client );
+
 
 
 
