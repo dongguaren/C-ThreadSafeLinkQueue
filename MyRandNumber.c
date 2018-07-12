@@ -8,11 +8,7 @@
 #include "ErrorHandle.h"
 #include "MyLog.h"
 
-typedef struct {
-    unsigned int randSeed;
-}MyRandNumberData;
 
-typedef MyRandNumberData RND;
 
 RND* RND_create( unsigned int seed ){
     RND* res = malloc(sizeof(RND));
@@ -40,28 +36,27 @@ unsigned int MRN_rand(RND *myRandNumberData)
 }
 
 
-int* getRandPosition( unsigned int seed,int minRandNum,int maxRandNum,int numOfRand ){
+int* getRandPosition( RND* randManager,int minRandNum,int maxRandNum,int numOfRand ){
 
-    int isParaLegal = ( 0 < seed && seed <= 65535 ) &&
-                      ( maxRandNum - minRandNum + 1 >= numOfRand );
+    int isParaLegal = ( maxRandNum - minRandNum + 1 >= numOfRand );
     if( !isParaLegal ){
         EH_logErrMsg("parameter is not legal!");
         return NULL;
     }
 
 
-    static RND *myRandNumberData = NULL;
-    static int primeSeed = -1;
-    if( myRandNumberData==NULL ){
-        myRandNumberData = RND_create(seed);
-        primeSeed = seed;
-    }
-
-    if( primeSeed != seed ){
-        RND_free( myRandNumberData );
-        myRandNumberData = RND_create(seed);
-        primeSeed = seed;
-    }
+    RND *myRandNumberData = randManager;
+//    static int primeSeed = -1;
+//    if( myRandNumberData==NULL ){
+//        myRandNumberData = RND_create(seed);
+//        primeSeed = seed;
+//    }
+//
+//    if( primeSeed != seed ){
+//        RND_free( myRandNumberData );
+//        myRandNumberData = RND_create(seed);
+//        primeSeed = seed;
+//    }
 
 
     int randRange = maxRandNum - minRandNum + 1;
@@ -119,15 +114,19 @@ void MRN_printRandArray( int *array,int len ){
 
 void MRN_test(){
 
+    RND* seed = RND_create(5);
+
     int *randArray;
-    randArray = getRandPosition( 5,0,40,10 );
+    randArray = getRandPosition( seed,0,40,10 );
     MRN_printRandArray(randArray,10);free(randArray);
-    randArray = getRandPosition( 5,0,40,10 );
+    randArray = getRandPosition( seed,0,40,10 );
     MRN_printRandArray(randArray,10);free(randArray);
-    randArray = getRandPosition( 4,0,40,10 );
+    randArray = getRandPosition( seed,0,40,10 );
     MRN_printRandArray(randArray,10);free(randArray);
-    randArray = getRandPosition( 5,0,40,10 );
+    randArray = getRandPosition( seed,0,40,10 );
     MRN_printRandArray(randArray,10);free(randArray);
+
+    RND_free(seed);
 
 }
 
