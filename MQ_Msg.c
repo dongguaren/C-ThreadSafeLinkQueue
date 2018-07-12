@@ -74,13 +74,14 @@ void MQ_Msg_destroy(Msg* t){
     if( !EH_isArgsLegal("Para illegal.Pointer is null.",1,t) ){
         return;
     }
-    free(t);
+
     if( t->msg_length!=0 ){
         free(t->message);
     }
     if( t->extra_length!=0 ){
         free(t->extraData);
     }
+    free(t);
 }
 
 
