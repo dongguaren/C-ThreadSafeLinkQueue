@@ -20,11 +20,12 @@
 int main()
 {
 //    TSQ_test();
+    CodeTest_sendMsgByTcpClient();
 //    MRN_test();
 //    MQ_Msg_test();
 //    CodeTest_sendMsgByTcpClient();
 //    TestMassge_test();
-    MQM_test();
+//    MQM_test();
     return 0;
 
 

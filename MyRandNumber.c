@@ -121,8 +121,12 @@ void MRN_test(){
     MRN_printRandArray(randArray,10);free(randArray);
     randArray = getRandPosition( seed,0,40,10 );
     MRN_printRandArray(randArray,10);free(randArray);
+
+    RND_free(seed);seed = RND_create(10);
     randArray = getRandPosition( seed,0,40,10 );
     MRN_printRandArray(randArray,10);free(randArray);
+
+    RND_free(seed);seed = RND_create(5);
     randArray = getRandPosition( seed,0,40,10 );
     MRN_printRandArray(randArray,10);free(randArray);
 

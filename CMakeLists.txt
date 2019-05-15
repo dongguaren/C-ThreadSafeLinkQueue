@@ -31,4 +31,4 @@ add_executable(MyTest main.c
         MessageTcpClient.c
         CodeTest/Test_MessageServerAndClient.h
         CodeTest/Test_MessageServerAndClient.c
-        MQ_Msg_What.h MQ_Msg_What.c)
+        MQ_Msg_What.h MQ_Msg_What.c MessageClientManager.c MessageClientManager.h)
